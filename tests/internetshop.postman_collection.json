@@ -1,0 +1,49 @@
+{
+  "info": {
+    "_postman_id": "5a0e988d-b19a-4761-809a-ad001be6cfa6",
+    "name": "internetshop",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43359030",
+    "_collection_link": "https://go.postman.co/collection/43359030-5a0e988d-b19a-4761-809a-ad001be6cfa6?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/cart/items?cart_id=1&product_id=1&quantity=2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "cart",
+            "items"
+          ],
+          "query": [
+            {
+              "key": "cart_id",
+              "value": "1"
+            },
+            {
+              "key": "product_id",
+              "value": "1"
+            },
+            {
+              "key": "quantity",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
