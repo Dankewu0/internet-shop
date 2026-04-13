@@ -4,62 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\CartItem;
 use Illuminate\Http\Request;
+use App\Services\CartItemService;
 
 class CartItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    public function __construct(protected CartItemService $service) {}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $item = $this->service->addItem($request->all());
+        return response()->json($item, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(CartItem $cartItem)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(CartItem $cartItem)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, CartItem $cartItem)
     {
-        //
+        $item = $this->service->updateItem($cartItem, $request->all());
+        return response()->json($item, 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(CartItem $cartItem)
     {
-        //
+        $this->service->deleteItem($cartItem);
+        return response()->json(null, 204);
     }
 }

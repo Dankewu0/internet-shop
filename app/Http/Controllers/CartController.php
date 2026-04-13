@@ -2,64 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private readonly CartService $service) {}
+
+    public function index(Request $request)
     {
-        //
+        $cart = $this->service->getCurrentCart($request);
+
+        return response()->json($cart);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            "product_id" => ["required", "integer", "exists:products,id"],
+            "quantity" => ["required", "integer", "min:1"],
+            "session_id" => ["nullable", "string", "max:255"],
+        ]);
+
+        $cart = $this->service->addItem($request, (int) $data["product_id"], (int) $data["quantity"]);
+
+        return response()->json($cart, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Cart $cart)
+    public function update(Request $request)
     {
-        //
+        $data = $request->validate([
+            "items" => ["required", "array", "min:1"],
+            "items.*.product_id" => ["required", "integer", "exists:products,id"],
+            "items.*.quantity" => ["required", "integer", "min:0"],
+            "session_id" => ["nullable", "string", "max:255"],
+        ]);
+
+        $cart = $this->service->updateItems($request, $data["items"]);
+
+        return response()->json($cart);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Cart $cart)
+    public function destroy(Request $request)
     {
-        //
-    }
+        $data = $request->validate([
+            "product_id" => ["nullable", "integer", "exists:products,id"],
+            "product_ids" => ["nullable", "array"],
+            "product_ids.*" => ["integer", "exists:products,id"],
+            "session_id" => ["nullable", "string", "max:255"],
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Cart $cart)
-    {
-        //
-    }
+        $ids = [];
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Cart $cart)
-    {
-        //
+        if (!empty($data["product_id"])) {
+            $ids[] = (int) $data["product_id"];
+        }
+
+        if (!empty($data["product_ids"])) {
+            $ids = array_merge($ids, $data["product_ids"]);
+        }
+
+        if (empty($ids)) {
+            $this->service->clear($request);
+        } else {
+            $this->service->removeItems($request, $ids);
+        }
+
+        return response()->json($this->service->getCurrentCart($request));
     }
 }
